@@ -63,5 +63,5 @@ def generateOTP(secretKey, otp_length=6, time_window=30):
 
     return otp
 
-    if __name__ == '__main__':
-        generateOTP("SECRET_KEY")
+if __name__ == '__main__':
+    print(generateOTP("SECRET_KEY"))
