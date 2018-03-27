@@ -61,5 +61,7 @@ def generateOTP(secretKey, otp_length=6, time_window=30):
     while len(otp) < OTP_LENGTH:
         otp = "0"+otp
 
+    return otp
+
     if __name__ == '__main__':
         generateOTP("SECRET_KEY")
