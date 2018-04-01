@@ -4,6 +4,8 @@ __author__ = "Narendra Solanki"
 from hashlib import sha1
 import hmac
 import time
+import base64
+import struct
 
 """
 This method will generate a HMAC based one-time-password (OTP) for dual factor authentication
@@ -18,20 +20,17 @@ This method will generate a HMAC based one-time-password (OTP) for dual factor a
 def generateOTP(secretKey, otp_length=6, time_window=30):
     OTP_LENGTH = otp_length
     TIME_WINDOW = time_window
-    key = secretKey.encode()
+    key = base64.b32decode(secretKey, True)
 
-    #get the current time
-    t = time.time()
+    #get the counter based on current time, truncated at 30 seconds boundary
+    t = int(time.time()//30)
 
-    #truncate time to 30 seconds boundary
-    t = t - t%TIME_WINDOW
-
-    #get time as byte array
-    msgTime = str(t)[:-2].encode()
+	#create a packed byte array
+    msgTime = struct.pack('!L',0) + struct.pack('!L',t)
 
     #convert hexdigest number to byte array
     #get HMAC string using SHA1 (160 bits or 20 bytes for SHA1)
-    hmac_result = hmac.new(key, msgTime, sha1).hexdigest().encode()
+    hmac_result = hmac.new(key, msgTime, sha1).digest()
 
     #get the last nibble(4-bit) from the hex number
     #we will use it as a dynamic index to get 4-byte number from 20 bytes number
@@ -64,4 +63,5 @@ def generateOTP(secretKey, otp_length=6, time_window=30):
     return otp
 
 if __name__ == '__main__':
-    print(generateOTP("SECRET_KEY"))
+    secret = 'qwertyuiopasdfgh'
+    print(generateOTP(secret))
